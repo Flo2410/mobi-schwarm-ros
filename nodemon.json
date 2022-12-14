@@ -1,0 +1,9 @@
+{
+  "verbose": true,
+  "restartable": "rs",
+  "ext": "*",
+  "ignore": ["*.tmp"],
+  "execMap": {
+    "sh": "sh"
+  }
+}
