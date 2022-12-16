@@ -22,6 +22,9 @@ password = ""
 
 theta_pub = None
 
+theta_id = 0x687F
+tau_id = 0x6A21
+
 
 def on_connect(client, userdata, flags, rc):
     rospy.loginfo(mqtt.connack_string(rc))
@@ -36,7 +39,7 @@ def on_message(client, userdata, msg):
     for d in data:
         id = int(d.get("tagId"))
 
-        if not id == 0x687F:
+        if not id == theta_id and not id == tau_id:
             continue
 
         if not d.get("success"):
@@ -66,7 +69,7 @@ def on_subscribe(client, userdata, mid, granted_qos):
 def main():
     global theta_pub
 
-    rospy.init_node("pozyx_mqtt", anonymous=True)
+    rospy.init_node("pozyx_mqtt", anonymous=False)
     theta_pub = rospy.Publisher("/theta/pozyx", Twist, queue_size=10)
 
     client = mqtt.Client(transport="websockets")

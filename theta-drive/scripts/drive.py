@@ -76,7 +76,7 @@ def main():
     global theta_pub
     atexit.register(exit_handler)
 
-    rospy.init_node("theta_drive", anonymous=True)
+    rospy.init_node("theta_drive", anonymous=False)
     theta_pub = rospy.Publisher("/theta/cmd_vel", Twist, queue_size=10)
     rospy.Subscriber("/theta/pozyx", Twist, callback)
 
