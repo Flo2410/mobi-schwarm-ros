@@ -14,9 +14,9 @@ import rospy
 from geometry_msgs.msg import Twist
 
 
-host = "mqtt.cloud.pozyxlabs.com"
-port = 443
-topic = ""
+host = "192.168.0.129"
+port = 1883
+topic = "tags"
 username = ""
 password = ""
 
@@ -72,11 +72,11 @@ def main():
     rospy.init_node("pozyx_mqtt", anonymous=False)
     theta_pub = rospy.Publisher("/theta/pozyx", Twist, queue_size=10)
 
-    client = mqtt.Client(transport="websockets")
+    client = mqtt.Client(transport="tcp")
     client.username_pw_set(username, password=password)
 
     # sets the secure context, enabling the WSS protocol
-    client.tls_set_context(context=ssl.create_default_context())
+    # client.tls_set_context(context=ssl.create_default_context())
 
     # set callbacks
     client.on_connect = on_connect
