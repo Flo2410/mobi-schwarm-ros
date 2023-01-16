@@ -8,10 +8,11 @@
 
 
 import paho.mqtt.client as mqtt
-import ssl
 import json
 import rospy
 from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
+import math
 
 
 host = "192.168.0.129"
@@ -21,6 +22,7 @@ username = ""
 password = ""
 
 theta_pub = None
+odom_pub = None
 
 theta_id = 0x687F
 tau_id = 0x6A21
@@ -57,8 +59,18 @@ def on_message(client, userdata, msg):
         pose.angular.y = ori.get("pitch")
         pose.angular.z = ori.get("yaw")
 
-        theta_pub.publish(pose)
+        turn = pose.angular.z
+        if (turn < 2 * float(math.pi)) and (turn > float(math.pi)):
+            print("right")
+            helper = math.pi - turn - math.pi
+            turn = math.pi + helper + 2 * math.pi
+        elif (turn < float(math.pi)) and (turn > 0):
+            print("left")
+            turn = -1 * (turn - math.pi)
 
+        pose.angular.z = turn
+
+        theta_pub.publish(pose)
         # rospy.loginfo(f"Positioning update: {id:<#6x} {pos} {ori}")
 
 
@@ -67,10 +79,11 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 
 def main():
-    global theta_pub
+    global theta_pub, odom_pub
 
     rospy.init_node("pozyx_mqtt", anonymous=False)
     theta_pub = rospy.Publisher("/theta/pozyx", Twist, queue_size=10)
+    odom_pub = rospy.Publisher("/odom", Odometry, queue_size=10)
 
     client = mqtt.Client(transport="tcp")
     client.username_pw_set(username, password=password)
