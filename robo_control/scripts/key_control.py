@@ -179,7 +179,7 @@ def main():
     # CAN-Interface initialisieren
     # read_serial_number()
 
-    pub = rospy.Publisher("/turtle1/cmd_vel", Twist, queue_size=10)
+    pub = rospy.Publisher("/theta/cmd_vel", Twist, queue_size=10)
     rospy.init_node("key_control", anonymous=True)
 
     while True:
