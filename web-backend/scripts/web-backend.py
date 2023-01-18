@@ -9,7 +9,7 @@ poses = []
 
 
 def on_client(msg):
-    rospy.Rate(2).sleep()
+    rospy.Rate(0.5).sleep()
     update_poses()
 
 
