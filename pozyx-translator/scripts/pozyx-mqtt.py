@@ -22,7 +22,7 @@ username = ""
 password = ""
 
 theta_pub = None
-odom_pub = None
+tau_pub = None
 
 theta_id = 0x687F
 tau_id = 0x6A21
@@ -32,9 +32,34 @@ def on_connect(client, userdata, flags, rc):
     rospy.loginfo(mqtt.connack_string(rc))
 
 
+def pub_pos(d, topic):
+    pos = d.get("data").get("coordinates")
+    ori = d.get("data").get("orientation")
+
+    pose = Twist()
+    pose.linear.x = pos.get("x")
+    pose.linear.y = pos.get("y")
+    pose.linear.z = pos.get("z")
+    pose.angular.x = ori.get("roll")
+    pose.angular.y = ori.get("pitch")
+    pose.angular.z = ori.get("yaw")
+
+    turn = pose.angular.z
+    if (turn < 2 * float(math.pi)) and (turn > float(math.pi)):
+        print("right")
+        helper = math.pi - turn - math.pi
+        turn = math.pi + helper + 2 * math.pi
+    elif (turn < float(math.pi)) and (turn > 0):
+        print("left")
+        turn = -1 * (turn - math.pi)
+
+    pose.angular.z = turn
+    topic.publish(pose)
+
+
 # Callback triggered by a new Pozyx data packet
 def on_message(client, userdata, msg):
-    global theta_pub
+    global theta_pub, tau_pub
 
     data = json.loads(msg.payload.decode())
 
@@ -48,29 +73,10 @@ def on_message(client, userdata, msg):
             rospy.logwarn(d.get("errorCode"))
             continue
 
-        pos = d.get("data").get("coordinates")
-        ori = d.get("data").get("orientation")
-
-        pose = Twist()
-        pose.linear.x = pos.get("x")
-        pose.linear.y = pos.get("y")
-        pose.linear.z = pos.get("z")
-        pose.angular.x = ori.get("roll")
-        pose.angular.y = ori.get("pitch")
-        pose.angular.z = ori.get("yaw")
-
-        turn = pose.angular.z
-        if (turn < 2 * float(math.pi)) and (turn > float(math.pi)):
-            print("right")
-            helper = math.pi - turn - math.pi
-            turn = math.pi + helper + 2 * math.pi
-        elif (turn < float(math.pi)) and (turn > 0):
-            print("left")
-            turn = -1 * (turn - math.pi)
-
-        pose.angular.z = turn
-
-        theta_pub.publish(pose)
+        if id == theta_id:
+            pub_pos(d, theta_pub)
+        elif id == tau_id:
+            pub_pos(d, tau_pub)
         # rospy.loginfo(f"Positioning update: {id:<#6x} {pos} {ori}")
 
 
@@ -79,11 +85,11 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 
 def main():
-    global theta_pub, odom_pub
+    global theta_pub, tau_pub
 
     rospy.init_node("pozyx_mqtt", anonymous=False)
     theta_pub = rospy.Publisher("/theta/pozyx", Twist, queue_size=10)
-    odom_pub = rospy.Publisher("/odom", Odometry, queue_size=10)
+    tau_pub = rospy.Publisher("/tau/pozyx", Twist, queue_size=10)
 
     client = mqtt.Client(transport="tcp")
     client.username_pw_set(username, password=password)
