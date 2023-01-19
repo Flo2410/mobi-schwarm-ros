@@ -186,8 +186,6 @@ def drive_loop():
         if np.abs(np.rad2deg(omega)) > 3:
             vel_msg.angular.z = rot_speed * turn_dir.value
 
-       
-
         rospy.loginfo(f"phi: {np.rad2deg(phi)} deg, t_dir: {np.rad2deg(t_dir)} deg, omega: {np.rad2deg(omega)} deg, turn_dir: {turn_dir.name}, dist: {dist} mm")
         key_vals = [
             KeyValue("distance", f"{np.format_float_positional(dist, 2)} mm"),
