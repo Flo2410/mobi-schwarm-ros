@@ -11,11 +11,13 @@ host=mobi_theta
 remote_path="/home/mobi/catkin_ws"
 
 
-ssh $host "screen -X -S pozyx-translator kill"
+# ssh $host "screen -X -S pozyx-translator kill"
 # ssh $host "screen -X -S pozyx-fake kill"
-ssh $host "screen -X -S web-backend kill"
+# ssh $host "screen -X -S web-backend kill"
+# ssh $host "screen -X -S mobi-imu kill"
 scp -r ./**/ $host:$remote_path/src
 ssh $host "cd $remote_path/ && source $remote_path/devel/setup.bash && catkin_make"
-#ssh $host "source $remote_path/devel/setup.bash && screen -S pozyx-fake -d -m rosrun pozyx-fake pozyx-fake.py"
-ssh $host "source $remote_path/devel/setup.bash && screen -S pozyx-translator -d -m rosrun pozyx-translator pozyx-mqtt.py"
-ssh $host "source $remote_path/devel/setup.bash && screen -S web-backend -d -m rosrun web-backend web-backend.py"
+# ssh $host "source $remote_path/devel/setup.bash && screen -S mobi-imu -d -m rosrun mobi-imu theta-imu.py"
+# ssh $host "source $remote_path/devel/setup.bash && screen -S pozyx-fake -d -m rosrun pozyx-fake pozyx-fake.py"
+# ssh $host "source $remote_path/devel/setup.bash && screen -S pozyx-translator -d -m rosrun pozyx-translator pozyx-mqtt.py"
+# ssh $host "source $remote_path/devel/setup.bash && screen -S web-backend -d -m rosrun web-backend web-backend.py"
