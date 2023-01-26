@@ -64,7 +64,7 @@ def main():
 
     can0 = can.interface.Bus(channel="can0", bustype="socketcan")
 
-    rospy.init_node("robo_move", anonymous=True)
+    rospy.init_node("theta_move", anonymous=False)
     rospy.Subscriber("/theta/cmd_vel", Twist, callback)
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
